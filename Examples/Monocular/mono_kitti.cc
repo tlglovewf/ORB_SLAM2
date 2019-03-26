@@ -36,21 +36,26 @@ void LoadImages(const string &strSequence, vector<string> &vstrImageFilenames,
 
 int main(int argc, char **argv)
 {
-    if(argc != 4)
-    {
-        cerr << endl << "Usage: ./mono_kitti path_to_vocabulary path_to_settings path_to_sequence" << endl;
-        return 1;
-    }
+//    if(argc != 4)
+//    {
+//        cerr << endl << "Usage: ./mono_kitti path_to_vocabulary path_to_settings path_to_sequence" << endl;
+//        return 1;
+//    }
 
     // Retrieve paths to images
     vector<string> vstrImageFilenames;
     vector<double> vTimestamps;
-    LoadImages(string(argv[3]), vstrImageFilenames, vTimestamps);
+    
+    const std::string ImgPath("/Volumes/mac/Data/00");
+    const std::string VocPath("/Volumes/mac/SlamResources/ORB_SLAM2/Vocabulary/ORBvoc.txt");
+    const std::string SetPath("/Volumes/mac/SlamResources/LearnVIORB/Examples/Monocular/KITTI00-02.yaml");
+    
+    LoadImages(ImgPath, vstrImageFilenames, vTimestamps);
 
     int nImages = vstrImageFilenames.size();
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR,true);
+    ORB_SLAM2::System SLAM(VocPath,SetPath,ORB_SLAM2::System::MONOCULAR,true);
 
     // Vector for tracking time statistics
     vector<float> vTimesTrack;
@@ -100,6 +105,7 @@ int main(int argc, char **argv)
         else if(ni>0)
             T = tframe-vTimestamps[ni-1];
 
+        SLAM.Refresh();
         if(ttrack<T)
             usleep((T-ttrack)*1e6);
     }
